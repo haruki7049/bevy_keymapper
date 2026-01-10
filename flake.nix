@@ -145,13 +145,11 @@
           };
 
           packages = {
-            inherit bevy_keymapper;
-            default = bevy_keymapper;
             doc = cargo-doc;
           };
 
           checks = {
-            inherit cargo-clippy;
+            inherit bevy_keymapper cargo-clippy cargo-doc;
           };
 
           devShells.default = pkgs.mkShell {
