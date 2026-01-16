@@ -1,6 +1,11 @@
 use bevy::prelude::*;
 use bevy_keymapper::KeymapperAppExt;
 
+#[derive(PartialEq)]
+enum KeymapLabel {
+    Send,
+}
+
 #[derive(Debug, Resource)]
 struct PlayerStats {
     hp: i32,
@@ -14,7 +19,7 @@ fn main() {
             hp: 100,
             name: "Haruki".into(),
         })
-        .add_keymap(KeyCode::Space, example_action_system)
+        .add_keymap(KeymapLabel::Send, KeyCode::Space, example_action_system)
         .run();
 }
 

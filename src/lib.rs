@@ -1,12 +1,16 @@
 use bevy::prelude::*;
 
 #[derive(Resource)]
-pub struct KeymapsManager {
-    pub keymaps: Vec<Keymap>,
+pub struct KeymapsManager<T: Send + Sync + 'static> {
+    pub keymaps: Vec<Keymap<T>>,
 }
 
-impl KeymapsManager {
-    pub fn new(keymaps: Vec<Keymap>) -> Self {
+impl<T: PartialEq + Send + Sync + 'static> KeymapsManager<T> {
+    pub fn remove(&mut self, label: T) {
+        self.keymaps.retain(|k| k.label != label);
+    }
+
+    pub fn new(keymaps: Vec<Keymap<T>>) -> Self {
         Self { keymaps }
     }
 
@@ -31,15 +35,17 @@ impl KeymapsManager {
     }
 }
 
-pub struct Keymap {
+pub struct Keymap<T> {
+    pub label: T,
     pub keycode: KeyCode,
     pub system: Box<dyn System<In = (), Out = ()>>,
     initialized: bool,
 }
 
-impl Keymap {
-    pub fn new<M>(keycode: KeyCode, system: impl IntoSystem<(), (), M>) -> Self {
+impl<T> Keymap<T> {
+    pub fn new<M>(label: T, keycode: KeyCode, system: impl IntoSystem<(), (), M>) -> Self {
         Self {
+            label,
             keycode,
             system: Box::new(IntoSystem::into_system(system)),
             initialized: false,
@@ -47,13 +53,16 @@ impl Keymap {
     }
 }
 
-pub fn keymaps_runner_system(world: &mut World) {
+pub fn keymaps_runner_system<T>(world: &mut World)
+where
+    T: Send + Sync + PartialEq + 'static,
+{
     let keyboard_input = world.resource::<ButtonInput<KeyCode>>().clone();
     let keycodes: Vec<KeyCode> = keyboard_input.get_just_pressed().copied().collect();
 
     let result = world.resource_scope(
         |world,
-         mut manager: Mut<KeymapsManager>|
+         mut manager: Mut<KeymapsManager<T>>|
          -> Result<(), Box<bevy::ecs::system::RunSystemError>> {
             for keycode in keycodes {
                 manager.run(world, keycode)?;
@@ -69,18 +78,33 @@ pub fn keymaps_runner_system(world: &mut World) {
 }
 
 pub trait KeymapperAppExt {
-    fn add_keymap<M>(&mut self, keycode: KeyCode, system: impl IntoSystem<(), (), M>) -> &mut Self;
+    fn add_keymap<M, T>(
+        &mut self,
+        label: T,
+        keycode: KeyCode,
+        system: impl IntoSystem<(), (), M>,
+    ) -> &mut Self
+    where
+        T: Send + Sync + PartialEq + 'static;
 }
 
 impl KeymapperAppExt for App {
-    fn add_keymap<M>(&mut self, keycode: KeyCode, system: impl IntoSystem<(), (), M>) -> &mut Self {
-        if !self.world().contains_resource::<KeymapsManager>() {
-            self.insert_resource(KeymapsManager::new(vec![]));
-            self.add_systems(Update, keymaps_runner_system);
+    fn add_keymap<M, T>(
+        &mut self,
+        label: T,
+        keycode: KeyCode,
+        system: impl IntoSystem<(), (), M>,
+    ) -> &mut Self
+    where
+        T: Send + Sync + PartialEq + 'static,
+    {
+        if !self.world().contains_resource::<KeymapsManager<T>>() {
+            self.insert_resource(KeymapsManager::<T>::new(vec![]));
+            self.add_systems(Update, keymaps_runner_system::<T>);
         }
 
-        let mut manager = self.world_mut().resource_mut::<KeymapsManager>();
-        manager.keymaps.push(Keymap::new(keycode, system));
+        let mut manager = self.world_mut().resource_mut::<KeymapsManager<T>>();
+        manager.keymaps.push(Keymap::new(label, keycode, system));
 
         self
     }
