@@ -865,15 +865,6 @@ name = "bevy_keymapper"
 version = "0.1.0"
 dependencies = [
  "bevy",
- "bevy_keymapper_derive",
-]
-
-[[package]]
-name = "bevy_keymapper_derive"
-version = "0.1.0"
-dependencies = [
- "quote",
- "syn",
 ]
 
 [[package]]
