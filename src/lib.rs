@@ -32,9 +32,7 @@ pub struct Keymap {
     pub system: Box<dyn System<In = (), Out = ()>>,
 }
 
-pub fn keymaps_runner_system(
-    world: &mut World,
-) {
+pub fn keymaps_runner_system(world: &mut World) {
     let keyboard_input = world.resource::<ButtonInput<KeyCode>>().clone();
     let keycodes: Vec<KeyCode> = keyboard_input.get_just_pressed().copied().collect();
 
