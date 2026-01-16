@@ -4,7 +4,7 @@ members = ["bevy_keymapper_derive"]
 
 [workspace.dependencies]
 bevy_keymapper_derive.path = "bevy_keymapper_derive"
-bevy = "0.17"
+bevy = "0.17.3"
 quote = "1.0.43"
 syn = "2.0.114"
 
