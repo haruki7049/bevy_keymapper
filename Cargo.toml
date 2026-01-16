@@ -1,8 +1,6 @@
 [workspace]
 resolver = "3"
-members = [
-  "bevy_keymapper_derive",
-]
+members = ["bevy_keymapper_derive"]
 
 [workspace.dependencies]
 bevy_keymapper_derive.path = "bevy_keymapper_derive"
