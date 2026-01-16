@@ -34,8 +34,14 @@ fn main() {
         })
         .add_keymap(DebugKeymaps::Send, KeyCode::Space, debug_system)
         .add_keymap(ReleaseKeymaps::Send, KeyCode::Space, release_system)
-        .add_systems(Update, keymaps_runner_system::<DebugKeymaps>.run_if(in_state(GameMode::Debug)))
-        .add_systems(Update, keymaps_runner_system::<ReleaseKeymaps>.run_if(in_state(GameMode::Release)))
+        .add_systems(
+            Update,
+            keymaps_runner_system::<DebugKeymaps>.run_if(in_state(GameMode::Debug)),
+        )
+        .add_systems(
+            Update,
+            keymaps_runner_system::<ReleaseKeymaps>.run_if(in_state(GameMode::Release)),
+        )
         .run();
 }
 
