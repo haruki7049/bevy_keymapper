@@ -79,7 +79,6 @@ impl KeymapperAppExt for App {
             self.add_systems(Update, keymaps_runner_system);
         }
 
-        let system = IntoSystem::into_system(system);
         let mut manager = self.world_mut().resource_mut::<KeymapsManager>();
         manager.keymaps.push(Keymap::new(keycode, system));
 
