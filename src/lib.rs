@@ -17,7 +17,11 @@ impl KeymapsManager {
     ) -> Result<(), Box<bevy::ecs::system::RunSystemError>> {
         for keymap in &mut self.keymaps {
             if keymap.keycode == keycode {
-                keymap.system.initialize(world);
+                if !keymap.initialized {
+                    keymap.system.initialize(world);
+                    keymap.initialized = true;
+                }
+
                 keymap.system.run((), world)?;
                 keymap.system.apply_deferred(world);
             }
@@ -30,6 +34,7 @@ impl KeymapsManager {
 pub struct Keymap {
     pub keycode: KeyCode,
     pub system: Box<dyn System<In = (), Out = ()>>,
+    initialized: bool,
 }
 
 impl Keymap {
@@ -37,6 +42,7 @@ impl Keymap {
         Self {
             keycode,
             system: Box::new(IntoSystem::into_system(system)),
+            initialized: false,
         }
     }
 }
@@ -74,12 +80,8 @@ impl KeymapperAppExt for App {
         }
 
         let system = IntoSystem::into_system(system);
-
         let mut manager = self.world_mut().resource_mut::<KeymapsManager>();
-        manager.keymaps.push(Keymap {
-            keycode,
-            system: Box::new(system),
-        });
+        manager.keymaps.push(Keymap::new(keycode, system));
 
         self
     }

@@ -10,7 +10,10 @@ struct PlayerStats {
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .insert_resource(PlayerStats { hp: 100, name: "Haruki".into() })
+        .insert_resource(PlayerStats {
+            hp: 100,
+            name: "Haruki".into(),
+        })
         .add_keymap(KeyCode::Space, example_action_system)
         .run();
 }
