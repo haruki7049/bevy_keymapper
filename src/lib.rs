@@ -8,17 +8,26 @@ pub struct KeymapsManager {
     pub keymaps: Vec<Keymap>,
 }
 
-type Function = dyn Fn(&mut Commands, &dyn Environment) + Send + Sync;
-
 impl KeymapsManager {
     pub fn new(keymaps: Vec<Keymap>) -> Self {
         Self { keymaps }
+    }
+
+    pub fn run(&mut self, world: &mut World, keycode: KeyCode) -> Result<(), Box<bevy::ecs::system::RunSystemError>> {
+        for keymap in &mut self.keymaps {
+            if keymap.keycode == keycode {
+                keymap.system.run((), world)?;
+                keymap.system.apply_deferred(world);
+            }
+        }
+
+        Ok(())
     }
 }
 
 pub struct Keymap {
     pub keycode: KeyCode,
-    pub function: Box<Function>,
+    pub system: Box<dyn System<In = (), Out = ()>>,
 }
 
 pub trait Environment: Any + Send + Sync {
@@ -26,17 +35,19 @@ pub trait Environment: Any + Send + Sync {
     fn as_any_mut(&mut self) -> &mut dyn Any;
 }
 
-pub fn keymaps_runner_system<E: Environment + Resource>(
-    mut commands: Commands,
-    environment: Res<E>,
-    manager: Res<KeymapsManager>,
-    keyboard_input: Res<ButtonInput<KeyCode>>,
-) {
-    for &keycode in keyboard_input.get_just_pressed() {
-        for keymap in manager.keymaps.iter() {
-            if keymap.keycode == keycode {
-                (keymap.function)(&mut commands, &*environment);
-            }
+pub fn keymaps_runner_system(
+    world: &mut World
+) -> Result<(), Box<bevy::ecs::system::RunSystemError>> {
+    let keyboard_input = world.resource::<ButtonInput<KeyCode>>().clone();
+    let keycodes: Vec<KeyCode> = keyboard_input.get_just_pressed().copied().collect();
+
+    world.resource_scope(|world, mut manager: Mut<KeymapsManager>| -> Result<(), Box<bevy::ecs::system::RunSystemError>> {
+        for keycode in keycodes {
+            manager.run(world, keycode)?;
         }
-    }
+
+        Ok(())
+    })?;
+
+    Ok(())
 }
