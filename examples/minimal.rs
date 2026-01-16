@@ -1,8 +1,7 @@
 use bevy::prelude::*;
-use bevy_keymapper::{Environment, Keymap, KeymapsManager, keymaps_runner_system};
-use std::any::Any;
+use bevy_keymapper::{Keymap, KeymapsManager, keymaps_runner_system};
 
-#[derive(Resource, Environment)]
+#[derive(Debug, Resource)]
 struct PlayerStats {
     hp: i32,
     name: String,
@@ -20,18 +19,14 @@ fn main() {
         .insert_resource(KeymapsManager {
             keymaps: vec![Keymap {
                 keycode: KeyCode::Space,
-                function: Box::new(|_commands, env| {
-                    // Downcast to the specific implementation
-                    if let Some(stats) = env.as_any().downcast_ref::<PlayerStats>() {
-                        println!(
-                            "Player '{}' (HP: {}) triggered an action!",
-                            stats.name, stats.hp
-                        );
-                    }
-                }),
+                system: Box::new(example_action_system),
             }],
         })
         // 3. Register the system with the specific Environment type
-        .add_systems(Update, keymaps_runner_system::<PlayerStats>)
+        .add_systems(Update, keymaps_runner_system)
         .run();
+}
+
+fn example_action_system(stats: Res<PlayerStats>) {
+    println!("Action triggered for player: {:?}", stats);
 }
