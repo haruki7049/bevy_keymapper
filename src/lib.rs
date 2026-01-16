@@ -33,11 +33,11 @@ pub struct Keymap {
 
 pub fn keymaps_runner_system(
     world: &mut World,
-) -> Result<(), Box<bevy::ecs::system::RunSystemError>> {
+) {
     let keyboard_input = world.resource::<ButtonInput<KeyCode>>().clone();
     let keycodes: Vec<KeyCode> = keyboard_input.get_just_pressed().copied().collect();
 
-    world.resource_scope(
+    let result = world.resource_scope(
         |world,
          mut manager: Mut<KeymapsManager>|
          -> Result<(), Box<bevy::ecs::system::RunSystemError>> {
@@ -47,7 +47,9 @@ pub fn keymaps_runner_system(
 
             Ok(())
         },
-    )?;
+    );
 
-    Ok(())
+    if let Err(e) = result {
+        error!("Keymapper error: {}", e);
+    }
 }

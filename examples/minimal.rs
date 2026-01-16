@@ -19,7 +19,7 @@ fn main() {
         .insert_resource(KeymapsManager {
             keymaps: vec![Keymap {
                 keycode: KeyCode::Space,
-                system: Box::new(example_action_system),
+                system: Box::new(IntoSystem::into_system(example_action_system)),
             }],
         })
         // 3. Register the system with the specific Environment type
