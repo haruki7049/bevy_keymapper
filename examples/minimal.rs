@@ -20,7 +20,7 @@ fn main() {
         .insert_resource(KeymapsManager {
             keymaps: vec![Keymap {
                 keycode: KeyCode::Space,
-                function: Box::new(|commands, env| {
+                function: Box::new(|_commands, env| {
                     // Downcast to the specific implementation
                     if let Some(stats) = env.as_any().downcast_ref::<PlayerStats>() {
                         println!(
