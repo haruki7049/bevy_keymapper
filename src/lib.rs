@@ -8,6 +8,8 @@ pub struct KeymapsManager {
     pub keymaps: Vec<Keymap>,
 }
 
+type Function = dyn Fn(&mut Commands, &dyn Environment) + Send + Sync;
+
 impl KeymapsManager {
     pub fn new(keymaps: Vec<Keymap>) -> Self {
         Self { keymaps }
@@ -16,7 +18,7 @@ impl KeymapsManager {
 
 pub struct Keymap {
     pub keycode: KeyCode,
-    pub function: Box<dyn Fn(&mut Commands, &dyn Environment) + Send + Sync>,
+    pub function: Box<Function>,
 }
 
 pub trait Environment: Any + Send + Sync {
