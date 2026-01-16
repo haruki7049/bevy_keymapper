@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_keymapper::KeymapperAppExt;
+use bevy_keymapper::{KeymapperAppExt, keymaps_runner_system};
 
 #[derive(PartialEq)]
 enum KeymapLabel {
@@ -20,6 +20,7 @@ fn main() {
             name: "Haruki".into(),
         })
         .add_keymap(KeymapLabel::Send, KeyCode::Space, example_action_system)
+        .add_systems(Update, keymaps_runner_system::<KeymapLabel>)
         .run();
 }
 

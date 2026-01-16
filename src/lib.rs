@@ -100,7 +100,6 @@ impl KeymapperAppExt for App {
     {
         if !self.world().contains_resource::<KeymapsManager<T>>() {
             self.insert_resource(KeymapsManager::<T>::new(vec![]));
-            self.add_systems(Update, keymaps_runner_system::<T>);
         }
 
         let mut manager = self.world_mut().resource_mut::<KeymapsManager<T>>();
