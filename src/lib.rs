@@ -1,7 +1,4 @@
-pub use bevy_keymapper_derive::Environment;
-
 use bevy::prelude::*;
-use std::any::Any;
 
 #[derive(Resource)]
 pub struct KeymapsManager {
@@ -32,11 +29,6 @@ impl KeymapsManager {
 pub struct Keymap {
     pub keycode: KeyCode,
     pub system: Box<dyn System<In = (), Out = ()>>,
-}
-
-pub trait Environment: Any + Send + Sync {
-    fn as_any(&self) -> &dyn Any;
-    fn as_any_mut(&mut self) -> &mut dyn Any;
 }
 
 pub fn keymaps_runner_system(
