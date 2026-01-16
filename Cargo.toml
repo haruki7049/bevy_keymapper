@@ -4,7 +4,7 @@ members = ["bevy_keymapper_derive"]
 
 [workspace.dependencies]
 bevy_keymapper_derive.path = "bevy_keymapper_derive"
-bevy = "0.17.3"
+bevy = { version = "0.17.3", default-features = false, features = ["bevy_log"] }
 quote = "1.0.43"
 syn = "2.0.114"
 
@@ -16,3 +16,6 @@ edition = "2024"
 [dependencies]
 bevy.workspace = true
 bevy_keymapper_derive.workspace = true
+
+[dev-dependencies]
+bevy = { workspace = true, default-features = true }
