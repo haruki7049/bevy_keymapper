@@ -13,7 +13,11 @@ impl KeymapsManager {
         Self { keymaps }
     }
 
-    pub fn run(&mut self, world: &mut World, keycode: KeyCode) -> Result<(), Box<bevy::ecs::system::RunSystemError>> {
+    pub fn run(
+        &mut self,
+        world: &mut World,
+        keycode: KeyCode,
+    ) -> Result<(), Box<bevy::ecs::system::RunSystemError>> {
         for keymap in &mut self.keymaps {
             if keymap.keycode == keycode {
                 keymap.system.run((), world)?;
@@ -36,18 +40,22 @@ pub trait Environment: Any + Send + Sync {
 }
 
 pub fn keymaps_runner_system(
-    world: &mut World
+    world: &mut World,
 ) -> Result<(), Box<bevy::ecs::system::RunSystemError>> {
     let keyboard_input = world.resource::<ButtonInput<KeyCode>>().clone();
     let keycodes: Vec<KeyCode> = keyboard_input.get_just_pressed().copied().collect();
 
-    world.resource_scope(|world, mut manager: Mut<KeymapsManager>| -> Result<(), Box<bevy::ecs::system::RunSystemError>> {
-        for keycode in keycodes {
-            manager.run(world, keycode)?;
-        }
+    world.resource_scope(
+        |world,
+         mut manager: Mut<KeymapsManager>|
+         -> Result<(), Box<bevy::ecs::system::RunSystemError>> {
+            for keycode in keycodes {
+                manager.run(world, keycode)?;
+            }
 
-        Ok(())
-    })?;
+            Ok(())
+        },
+    )?;
 
     Ok(())
 }
