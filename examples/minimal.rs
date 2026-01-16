@@ -7,6 +7,7 @@ enum KeymapLabel {
 }
 
 #[derive(Debug, Resource)]
+#[allow(dead_code)]
 struct PlayerStats {
     hp: i32,
     name: String,
