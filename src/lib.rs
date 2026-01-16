@@ -17,6 +17,7 @@ impl KeymapsManager {
     ) -> Result<(), Box<bevy::ecs::system::RunSystemError>> {
         for keymap in &mut self.keymaps {
             if keymap.keycode == keycode {
+                keymap.system.initialize(world);
                 keymap.system.run((), world)?;
                 keymap.system.apply_deferred(world);
             }
