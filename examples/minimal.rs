@@ -2,15 +2,10 @@ use bevy::prelude::*;
 use bevy_keymapper::{KeymapsManager, Keymap, Environment, keymaps_runner_system};
 use std::any::Any;
 
-#[derive(Resource)]
+#[derive(Resource, Environment)]
 struct PlayerStats {
     hp: i32,
     name: String,
-}
-
-impl Environment for PlayerStats {
-    fn as_any(&self) -> &dyn Any { self }
-    fn as_any_mut(&mut self) -> &mut dyn Any { self }
 }
 
 fn main() {

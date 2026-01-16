@@ -1,3 +1,5 @@
+pub use bevy_keymapper_derive::Environment;
+
 use bevy::prelude::*;
 use std::any::Any;
 
