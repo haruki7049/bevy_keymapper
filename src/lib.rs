@@ -44,12 +44,12 @@ use bevy::prelude::*;
 ///
 /// * `T` - A label type used to identify and organize keymaps. Must implement `Send + Sync + 'static`.
 #[derive(Resource)]
-pub struct KeymapsManager<T: Send + Sync + 'static> {
+pub struct Keymapper<T: Send + Sync + 'static> {
     /// The collection of keymaps managed by this manager.
     pub keymaps: Vec<Keymap<T>>,
 }
 
-impl<T: PartialEq + Send + Sync + 'static> KeymapsManager<T> {
+impl<T: PartialEq + Send + Sync + 'static> Keymapper<T> {
     /// Removes all keymaps with the specified label.
     ///
     /// # Arguments
@@ -65,7 +65,7 @@ impl<T: PartialEq + Send + Sync + 'static> KeymapsManager<T> {
         self.keymaps.retain(|k| k.label != label);
     }
 
-    /// Creates a new `KeymapsManager` with the given keymaps.
+    /// Creates a new `Keymapper` with the given keymaps.
     ///
     /// # Arguments
     ///
@@ -73,7 +73,7 @@ impl<T: PartialEq + Send + Sync + 'static> KeymapsManager<T> {
     ///
     /// # Returns
     ///
-    /// A new `KeymapsManager` instance.
+    /// A new `Keymapper` instance.
     pub fn new(keymaps: Vec<Keymap<T>>) -> Self {
         Self { keymaps }
     }
@@ -193,7 +193,7 @@ where
 
     let result = world.resource_scope(
         |world,
-         mut manager: Mut<KeymapsManager<T>>|
+         mut manager: Mut<Keymapper<T>>|
          -> Result<(), Box<bevy::ecs::system::RunSystemError>> {
             for keycode in keycodes {
                 manager.run(world, keycode)?;
@@ -211,12 +211,12 @@ where
 /// An extension trait for `App` that adds keymap functionality.
 ///
 /// This trait provides convenience methods for adding keymaps to a Bevy application.
-/// It automatically manages the `KeymapsManager` resource.
+/// It automatically manages the `Keymapper` resource.
 pub trait KeymapperAppExt {
     /// Adds a keymap binding to the application.
     ///
     /// This method binds a keyboard key to a system. When the key is pressed,
-    /// the system will be executed. The `KeymapsManager` resource is automatically
+    /// the system will be executed. The `Keymapper` resource is automatically
     /// created if it doesn't exist.
     ///
     /// # Arguments
@@ -255,11 +255,11 @@ impl KeymapperAppExt for App {
     where
         T: Send + Sync + PartialEq + 'static,
     {
-        if !self.world().contains_resource::<KeymapsManager<T>>() {
-            self.insert_resource(KeymapsManager::<T>::new(vec![]));
+        if !self.world().contains_resource::<Keymapper<T>>() {
+            self.insert_resource(Keymapper::<T>::new(vec![]));
         }
 
-        let mut manager = self.world_mut().resource_mut::<KeymapsManager<T>>();
+        let mut manager = self.world_mut().resource_mut::<Keymapper<T>>();
         manager.keymaps.push(Keymap::new(label, keycode, system));
 
         self
